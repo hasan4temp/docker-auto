@@ -1,0 +1,125 @@
+#!/bin/bash 
+
+if [[ $# -eq 0 ]] ; then
+    echo 'give a compose.yaml url'
+    exit 0
+fi
+
+function sed_rt() {
+  echo "$1" | sed -e 's/^ *//g' -e 's/ *$//g' | sed -n '1 p'
+}
+
+function to_base64() {
+  echo "$1" | tr -d '\n' | base64 | tr -d '=' | tr -d '\n' | sed 's/\//%2F/g' | sed 's/\+/%2B/g'
+}
+
+function to_int() {
+  echo ${1/\.*/}
+}
+
+function to_num() {
+  case $1 in
+  '' | *[!0-9\.]*) echo 0 ;;
+  *) echo $1 ;;
+  esac
+}
+
+#os info
+if [ -z "$os_name" ]; then
+  if [ -e /etc/redhat-release ]; then
+    os_name=$(sed_rt "$(cat /etc/redhat-release)")
+  elif [ -e /etc/debian_version ]; then
+    os_name=$(sed_rt "Debian $(cat /etc/debian_version)")
+  fi
+
+  if [ -z "$os_name" ]; then
+    os_name=$(sed_rt "$(uname -s)")
+  fi
+fi
+
+if [ -z "$cpu_freq" ]; then
+  cpu_freq=$(sed_rt $(to_num "$(lscpu | grep 'CPU MHz' | awk -F\: '{ print $2 }' | sed -e 's/^ *//g' -e 's/ *$//g')"))
+fi
+
+
+ram_free=$(sed_rt $(to_num "$(cat /proc/meminfo | grep ^MemFree: | awk '{ print $2 }')"))
+
+
+#check if docker installed if not then install
+if [ ! -n "$(command -v docker)" ]; then
+        dnf -y update && sudo dnf install -y yum-utils && yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin && sudo systemctl enable --now docker && usermod -aG docker $USER
+fi
+
+if [ ! -n "$(command -v curl)" ]; then
+        yum install -y curl
+fi
+
+if [ ! -n "$(command -v jq)" ]; then
+        yum install -y jq
+fi
+
+if [ ! -n "$(command -v wget)" ]; then
+        yum install -y wget
+fi
+
+  if [ ! -n "$(command -v docker)" ]; then
+    fail "|\n|   Error: Cannot install docker, please install the docker and run the script again\n|"
+  fi
+
+
+curl $1 -o compose.yaml
+
+mkdir -p /home/mariadb_storage && chmod 777 /home/mariadb_storage
+mkdir -p /home/agent4docker && chmod 777 /home/agent4docker && wget https://gist.githubusercontent.com/hasan4temp/b02887eae61d8c5d3d70a6eb26a42d21/raw/efd5d80f790f62d412aaf6334f9fb6993002f1de/agent4docker.sh -O /home/agent4docker/agent4docker.sh
+chmod +x /home/agent4docker/agent4docker.sh
+
+echo "*/2 * * * * /bin/bash /home/agent4docker/agent4docker.sh" | crontab -
+
+echo -e "\n !!!!!!!!!!!!!!!!!!!!!Docker process listed below"
+docker compose up -d
+docker ps
+
+echo -e "\n !!!!!!!!!!!!!!!!!!!!!!Docker installed images listed below" 
+docker images
+
+#docker log
+#docker_log=$(curl -F file=@/var/lib/docker/containers/$log_path/$log_path-json.log https://store1.gofile.io/uploadFile)
+
+dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "name=mariadb")
+dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created | tr -d " \t\n\r")
+dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9}' | tail -1)
+
+echo -e "\n Docker stats for mariadb_____________________________________"
+echo "mariadb docker full ID: "$dockerfullid_mariadb 
+echo "mariadb docker created time: "$dockercreated_mariadb
+echo "mariadb docker status: "$dockerstatus_mariadb
+
+echo -e "\n"
+
+dockerfullid_phpmyadmin=$(docker container ls --all --quiet --no-trunc --filter "name=phpmyadmin")
+dockercreated_phpmyadmin=$(docker inspect $dockerfullid_phpmyadmin | grep -i created | tr -d " \t\n\r")
+dockerstatus_phpmyadmin=$(docker ps --filter name=phpmyadmin | awk '{print $7,$8,$9}' | tail -1)
+
+echo -e "\n Docker stats for phpmyadmin_____________________________________"
+echo -e "phpmyadmin docker full ID: "$dockerfullid_phpmyadmin
+echo -e "phpmyadmin docker created time: "$dockercreated_phpmyadmin
+echo -e "phpmyadmin docker status: "$dockerstatus_phpmyadmin
+
+echo -e "\n Linux stats_____________________________________"
+
+publicIP=$(wget -qO - icanhazip.com)                                                                                                                 
+uptime=$(uptime | tr -d " \t\n\r")
+#uptime=$(sed_rt $(to_int "$(cat /proc/uptime | awk '{ print $1 }')"))
+
+echo "PublicIP = $publicIP"
+echo "os_name = $os_name"
+echo "cpu_freq = $cpu_freq"
+echo "ram_free = $ram_free"
+echo "system uptime = $uptime"
+
+#data="PublicIP:$publicIP | Uptime:$uptime | OS:$os_name | CPU:$cpu_freq | RamFree:$ram_free | MariadbID:$dockerfullid_mariadb | mariadbCreatedTime:$dockercreated_mariadb | MariadbStatus:$dockerstatus_mariadb | phpmyadminID:$dockerfullid_phpmyadmin | phpmyadminCreatedTime:$dockercreated_phpmyadmin | phpmyadminStatus:$dockerstatus_phpmyadmin"
+
+#encoded=$(echo $data | base64 | tr -d " \t\n\r")
+#echo $encoded
+
+ #wget -q -o /dev/null -T 25 --post-data "$encoded" --no-check-certificate "https://agent.syagent.com/agent"
