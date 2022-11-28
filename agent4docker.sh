@@ -203,7 +203,7 @@ $(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "m
 #$(to_base64 "") $(to_base64 "") $(to_base64 "") $(to_base64 "")"
 echo $multipart_data
 
-#curl -s -X POST -H "Content-Type: multipart/form-data" -F "token=${token_file[0]}" -F "$multipart_data" $url
+curl -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data" $1
 
 <<com
 echo "expire= $expire_date"
