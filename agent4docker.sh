@@ -197,7 +197,7 @@ echo -e "phpmyadmin docker status: "$dockerstatus_phpmyadmin
 
 multipart_data="data=$(to_base64 "publicIP:$publicIP") $(to_base64 "version:$version") $(to_base64 "uptime:$uptime") $(to_base64 "os_name:$os_name") $(to_base64 "cpu_freq:$cpu_freq")
 $(to_base64 "ram_usage:$ram_usage") $(to_base64 "ram_total:$ram_total") $(to_base64 "disk_usage:$disk_usage") $(to_base64 "rx:$rx") $(to_base64 "tx:$tx")
-$(to_base64 "load:$load") $(to_base64 "load_cpu:$load_cpu") $(to_base64 "load_io:$load_io") $(to_base64 "port_check:$port_check") $(to_base64 "phpmyadmin docker full ID:$dockerfullid_phpmyadmin")
+$(to_base64 "load:$load") $(to_base64 "load_cpu:$load_cpu") $(to_base64 "load_io:$load_io") $(to_base64 "phpmyadmin docker full ID:$dockerfullid_phpmyadmin")
 $(to_base64 "phpmyadmin docker created time:$dockercreated_phpmyadmin") $(to_base64 "phpmyadmin docker status:$dockerstatus_phpmyadmin") $(to_base64 "mariadb docker full ID:$dockerfullid_mariadb")
 $(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "mariadb docker status:$dockerstatus_mariadb")"
 #$(to_base64 "") $(to_base64 "") $(to_base64 "") $(to_base64 "")"
