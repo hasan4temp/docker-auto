@@ -178,28 +178,35 @@ publicIP=$(wget -qO - icanhazip.com)
 #docker_log=$(curl -F file=@/var/lib/docker/containers/$log_path/$log_path-json.log https://store1.gofile.io/uploadFile)
 dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "name=mariadb")
 dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created | tr -d " \t\n\r")
-dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9}' | tail -1)
+#dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9}' | tail -1)
+dockerstatus_mariadb=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i status)
+dockerstate_mariadb=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i state)
+
 echo -e "\n Docker stats for mariadb_____________________________________"
 echo "mariadb docker full ID: "$dockerfullid_mariadb 
 echo "mariadb docker created time: "$dockercreated_mariadb
 echo "mariadb docker status: "$dockerstatus_mariadb
+echo "mariadb docker state: "$dockerstate_mariadb
 
 echo -e "\n"
 
 dockerfullid_phpmyadmin=$(docker container ls --all --quiet --no-trunc --filter "name=phpmyadmin")
 dockercreated_phpmyadmin=$(docker inspect $dockerfullid_phpmyadmin | grep -i created | tr -d " \t\n\r")
-dockerstatus_phpmyadmin=$(docker ps --filter name=phpmyadmin | awk '{print $7,$8,$9}' | tail -1)
+#dockerstatus_phpmyadmin=$(docker ps --filter name=phpmyadmin | awk '{print $7,$8,$9}' | tail -1)
+dockerstatus_phpmyadmin=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i status)
+dockerstate_phpmyadmin=$(docker ps --filter name=phpmyadmin --format '{{json .}}' | jq | grep -i state)
+
 echo -e "\n Docker stats for phpmyadmin_____________________________________"
 echo -e "phpmyadmin docker full ID: "$dockerfullid_phpmyadmin
 echo -e "phpmyadmin docker created time: "$dockercreated_phpmyadmin
 echo -e "phpmyadmin docker status: "$dockerstatus_phpmyadmin
-
+echo -e "phpmyadmin docker state: "$dockerstate_phpmyadmin
 
 multipart_data="data=$(to_base64 "publicIP:$publicIP") $(to_base64 "version:$version") $(to_base64 "uptime:$uptime") $(to_base64 "os_name:$os_name") $(to_base64 "cpu_freq:$cpu_freq")
 $(to_base64 "ram_usage:$ram_usage") $(to_base64 "ram_total:$ram_total") $(to_base64 "disk_usage:$disk_usage") $(to_base64 "rx:$rx") $(to_base64 "tx:$tx")
 $(to_base64 "load:$load") $(to_base64 "load_cpu:$load_cpu") $(to_base64 "load_io:$load_io") $(to_base64 "phpmyadmin docker full ID:$dockerfullid_phpmyadmin")
-$(to_base64 "phpmyadmin docker created time:$dockercreated_phpmyadmin") $(to_base64 "phpmyadmin docker status:$dockerstatus_phpmyadmin") $(to_base64 "mariadb docker full ID:$dockerfullid_mariadb")
-$(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "mariadb docker status:$dockerstatus_mariadb")"
+$(to_base64 "phpmyadmin docker created time:$dockercreated_phpmyadmin") $(to_base64 "phpmyadmin docker status:$dockerstatus_phpmyadmin") $(to_base64 "phpmyadmin docker state:$dockerstate_phpmyadmin") $(to_base64 "mariadb docker full ID:$dockerfullid_mariadb")
+$(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "mariadb docker status:$dockerstatus_mariadb") $(to_base64 "mariadb docker state:$dockerstate_mariadb")" 
 #$(to_base64 "") $(to_base64 "") $(to_base64 "") $(to_base64 "")"
 echo $multipart_data
 
