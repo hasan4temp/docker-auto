@@ -166,40 +166,33 @@ port_check=$(timeout 2 bash -c "</dev/tcp/google.com/808"; echo $?)
 expire_date=$(timeout 3 openssl s_client -connect google.com:443 -servername google.com 2> /dev/null | openssl x509 -noout -dates | awk -F '=' '{print $2}' | sed -n '2p' |  awk {'print $1 " " $2 " "$4'})
 publicIP=$(wget -qO - icanhazip.com)
 
-#multipart_data="data=$(to_base64 "version:$version") $(to_base64 "uptime:$uptime") $(to_base64 "$sessions") $(to_base64 "$processes") 
-#$(to_base64 "$processes_list") $(to_base64 "$file_handles") $(to_base64 "$file_handles_limit") $(to_base64 "$os_kernel") $(to_base64 "$os_name") 
-#$(to_base64 "$os_arch") $(to_base64 "$cpu_name") $(to_base64 "$cpu_cores") $(to_base64 "$cpu_freq") $(to_base64 "$ram_total") 
-#$(to_base64 "$ram_usage") $(to_base64 "$swap_total") $(to_base64 "$swap_usage") $(to_base64 "$disk_array") 
-#$(to_base64 "$disk_total") $(to_base64 "$disk_usage") $(to_base64 "$connections") $(to_base64 "$nic") $(to_base64 "$ipv4") $(to_base64 "$ipv6") 
-#$(to_base64 "$rx") $(to_base64 "$tx") $(to_base64 "$rx_gap") $(to_base64 "$tx_gap") $(to_base64 "$load") $(to_base64 "$load_cpu") 
-#$(to_base64 "$load_io") $(to_base64 "$port_check") $(to_base64 "$expire_date")"
-
 #docker log
 #docker_log=$(curl -F file=@/var/lib/docker/containers/$log_path/$log_path-json.log https://store1.gofile.io/uploadFile)
 dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "name=mariadb")
 dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created | tr -d " \t\n\r")
-#dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9}' | tail -1)
-dockerstatus_mariadb=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i status)
 dockerstate_mariadb=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i state)
+mariadb_stats=$(docker stats $dockerfullid_mariadb --no-stream)
 
 echo -e "\n Docker stats for mariadb_____________________________________"
 echo "mariadb docker full ID: "$dockerfullid_mariadb 
 echo "mariadb docker created time: "$dockercreated_mariadb
-echo "mariadb docker status: "$dockerstatus_mariadb
 echo "mariadb docker state: "$dockerstate_mariadb
+echo "mariadb docker stats: "$mariadb_stats
 
 echo -e "\n"
-
-
 
 multipart_data="data=$(to_base64 "publicIP:$publicIP") $(to_base64 "version:$version") $(to_base64 "uptime:$uptime") $(to_base64 "os_name:$os_name") $(to_base64 "cpu_freq:$cpu_freq")
 $(to_base64 "ram_usage:$ram_usage") $(to_base64 "ram_total:$ram_total") $(to_base64 "disk_usage:$disk_usage") $(to_base64 "rx:$rx") $(to_base64 "tx:$tx")
 $(to_base64 "load:$load") $(to_base64 "load_cpu:$load_cpu") $(to_base64 "load_io:$load_io") $(to_base64 "mariadb docker full ID:$dockerfullid_mariadb")
-$(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "mariadb docker status:$dockerstatus_mariadb") $(to_base64 "mariadb docker state:$dockerstate_mariadb")" 
-#$(to_base64 "") $(to_base64 "") $(to_base64 "") $(to_base64 "")"
+$(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "mariadb docker stats: $mariadb_stats")"
+
+#$(to_base64 "") $(to_base64 "") $(to_base64 "")"
 echo $multipart_data
 
-curl -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data" $1
+
+#url=$(env | grep url | awk -F '=' '{print $2}')
+#curl -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data" $url #Need to add static url here. 
+
 
 <<com
 echo "expire= $expire_date"
