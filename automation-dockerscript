@@ -70,7 +70,7 @@ fi
 curl $1 -o compose.yaml
 
 mkdir -p /home/mariadb_storage && chmod 777 /home/mariadb_storage
-mkdir -p /home/agent4docker && chmod 777 /home/agent4docker && wget https://gist.githubusercontent.com/hasan4temp/b02887eae61d8c5d3d70a6eb26a42d21/raw/efd5d80f790f62d412aaf6334f9fb6993002f1de/agent4docker.sh -O /home/agent4docker/agent4docker.sh
+mkdir -p /home/agent4docker && chmod 777 /home/agent4docker && wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/agent4docker.sh -O /home/agent4docker/agent4docker.sh
 chmod +x /home/agent4docker/agent4docker.sh
 
 echo "*/2 * * * * /bin/bash /home/agent4docker/agent4docker.sh" | crontab -

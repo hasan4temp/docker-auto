@@ -191,5 +191,4 @@ curl -k -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data"  
 
 
 #docker log
-curl -k -F file=@/var/lib/docker/containers/$dockerfullid_mariadb/$dockerfullid_mariadb-json.log http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP
 exit 0
