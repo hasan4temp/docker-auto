@@ -113,4 +113,4 @@ echo "system uptime = $uptime"
 #encoded=$(echo $data | base64 | tr -d " \t\n\r")
 #echo $encoded
 
- #wget -q -o /dev/null -T 25 --post-data "$encoded" --no-check-certificate "https://agent.syagent.com/agent"
+#wget -q -o /dev/null -T 25 --post-data "$encoded" --no-check-certificate "https://agent.syagent.com/agent"

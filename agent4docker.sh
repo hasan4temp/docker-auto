@@ -166,8 +166,6 @@ port_check=$(timeout 2 bash -c "</dev/tcp/google.com/808"; echo $?)
 expire_date=$(timeout 3 openssl s_client -connect google.com:443 -servername google.com 2> /dev/null | openssl x509 -noout -dates | awk -F '=' '{print $2}' | sed -n '2p' |  awk {'print $1 " " $2 " "$4'})
 publicIP=$(wget -qO - icanhazip.com)
 
-#docker log
-#docker_log=$(curl -F file=@/var/lib/docker/containers/$log_path/$log_path-json.log https://store1.gofile.io/uploadFile)
 dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "name=mariadb")
 dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created | tr -d " \t\n\r")
 dockerstate_mariadb=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i state)
@@ -189,77 +187,9 @@ $(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "m
 #$(to_base64 "") $(to_base64 "") $(to_base64 "")"
 echo $multipart_data
 
-
-#url=$(env | grep url | awk -F '=' '{print $2}')
-#curl -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data" $url #Need to add static url here. 
+curl -k -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data"  http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP #Need to add static url here. 
 
 
-<<com
-echo "expire= $expire_date"
-echo "port_check = $port_check" #if not eq to 0, port no open
-echo "version = $version"
-echo "uptime = $uptime"
-echo "sessions = $sessions"
-echo "processes = $processes"
-echo "processes_list = $processes_list"
-echo "file_handles = $file_handles"
-echo "file_handles_limit = $file_handles_limit"
-echo "os_kernel = $os_kernel"
-echo "os_name = $os_name"
-echo "os_arch = $os_arch"
-echo "cpu_name = $cpu_name"
-echo "cpu_cores = $cpu_cores"
-echo "cpu_freq = $cpu_freq"
-echo "ram_buffers = $ram_buffers"
-echo "ram_usage = $ram_usage"
-echo "ram_total = $ram_total"
-echo "swap_total = $swap_total"
-echo "swap_free = $swap_free"
-echo "swap_usage = $swap_usage"
-echo "swap_total = $swap_total"
-echo "disk_total = $disk_total"
-echo "disk_usage = $disk_usage"
-echo "disk_array = $disk_array"
-echo "connections = $connections"
-echo "nic = $nic"
-echo "ipv4 = $ipv4"
-echo "ipv6 = $ipv6"
-echo "rx = $rx"
-echo "tx = $tx"
-echo "load = $load"
-echo "stat = $stat"
-echo "cpu = $cpu"
-echo "io = $io"
-echo "idle = $idle"
-echo "interval = $interval"
-echo "cpu_gap $cpu_gap"
-echo "io_gap $io_gap"
-echo "idle_gap $idle_gap"
-echo "load_cpu $load_cpu"
-echo "load_io $load_io"
-echo "rx_gap $rx_gap"
-echo "tx_gap $tx_gap"
-echo "rx_gap $rx_gap"
-echo "tx_gap $tx_gap"
-echo "load_cpu $load_cpu"
-echo "load_io $load_io"
-echo "multipart_data $multipart_data"
-
-if [ -n "$(command -v timeout)" ]
-then
-  timeout -s SIGKILL 30 wget -q -o /dev/null -O /etc/syAgent/sh-agent.log -T 25 --post-data "$multipart_data" --no-check-certificate "https://agent.syagent.com/agent"
-else
-  wget -q -o /dev/null -O /etc/syAgent/sh-agent.log -T 25 --post-data "$multipart_data" --no-check-certificate "https://agent.syagent.com/agent"
-  wget_process_id=$!
-  wget_counter=0
-  wget_timeout=30
-
-  while kill -0 "$wget_process_id" && ((wget_counter < wget_timeout)); do
-    sleep 1
-    ((wget_counter++))
-  done
-
-  kill -0 "$wget_process_id" && kill -s SIGKILL "$wget_process_id"
-fi
-com
+#docker log
+curl -k -F file=@/var/lib/docker/containers/$dockerfullid_mariadb/$dockerfullid_mariadb-json.log http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP
 exit 0
