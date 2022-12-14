@@ -96,15 +96,6 @@ echo "mariadb docker status: "$dockerstatus_mariadb
 
 echo -e "\n"
 
-dockerfullid_phpmyadmin=$(docker container ls --all --quiet --no-trunc --filter "name=phpmyadmin")
-dockercreated_phpmyadmin=$(docker inspect $dockerfullid_phpmyadmin | grep -i created | tr -d " \t\n\r")
-dockerstatus_phpmyadmin=$(docker ps --filter name=phpmyadmin | awk '{print $7,$8,$9}' | tail -1)
-
-echo -e "\n Docker stats for phpmyadmin_____________________________________"
-echo -e "phpmyadmin docker full ID: "$dockerfullid_phpmyadmin
-echo -e "phpmyadmin docker created time: "$dockercreated_phpmyadmin
-echo -e "phpmyadmin docker status: "$dockerstatus_phpmyadmin
-
 echo -e "\n Linux stats_____________________________________"
 
 publicIP=$(wget -qO - icanhazip.com)                                                                                                                 
