@@ -76,14 +76,11 @@ chmod +x /home/agent4docker/agent4docker.sh
 echo "*/2 * * * * /bin/bash /home/agent4docker/agent4docker.sh" | crontab -
 
 echo -e "\n !!!!!!!!!!!!!!!!!!!!!Docker process listed below"
+
 docker compose up -d
 docker ps
 
 echo -e "\n !!!!!!!!!!!!!!!!!!!!!!Docker installed images listed below" 
-docker images
-
-#docker log
-#docker_log=$(curl -F file=@/var/lib/docker/containers/$log_path/$log_path-json.log https://store1.gofile.io/uploadFile)
 
 dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "name=mariadb")
 dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created | tr -d " \t\n\r")
@@ -100,17 +97,10 @@ echo -e "\n Linux stats_____________________________________"
 
 publicIP=$(wget -qO - icanhazip.com)                                                                                                                 
 uptime=$(uptime | tr -d " \t\n\r")
-#uptime=$(sed_rt $(to_int "$(cat /proc/uptime | awk '{ print $1 }')"))
-
 echo "PublicIP = $publicIP"
 echo "os_name = $os_name"
 echo "cpu_freq = $cpu_freq"
 echo "ram_free = $ram_free"
 echo "system uptime = $uptime"
-
-#data="PublicIP:$publicIP | Uptime:$uptime | OS:$os_name | CPU:$cpu_freq | RamFree:$ram_free | MariadbID:$dockerfullid_mariadb | mariadbCreatedTime:$dockercreated_mariadb | MariadbStatus:$dockerstatus_mariadb | phpmyadminID:$dockerfullid_phpmyadmin | phpmyadminCreatedTime:$dockercreated_phpmyadmin | phpmyadminStatus:$dockerstatus_phpmyadmin"
-
-#encoded=$(echo $data | base64 | tr -d " \t\n\r")
-#echo $encoded
 
 #wget -q -o /dev/null -T 25 --post-data "$encoded" --no-check-certificate "https://agent.syagent.com/agent"

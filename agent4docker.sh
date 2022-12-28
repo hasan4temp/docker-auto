@@ -191,4 +191,6 @@ curl -k -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data"  
 
 
 #docker log
+#docker_log=$(curl -F file=@/var/lib/docker/containers/$log_path/$log_path-json.log https://store1.gofile.io/uploadFile)
+
 exit 0
