@@ -195,5 +195,5 @@ echo $multipart_data
 wget -T 25 --post-data "$multipart_data" --no-check-certificate "http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP" > /dev/null
 
 #docker log
-curl -F file=@/var/lib/docker/containers/$log_path/$log_path-json.log http://cluster.aamarpay.com/cluster-server/api/post-logs/103.174.50.210
+curl -F log_file=@/var/lib/docker/containers/$log_path/$log_path-json.log http://cluster.aamarpay.com/cluster-server/api/post-logs/$publicIP
 exit 0
