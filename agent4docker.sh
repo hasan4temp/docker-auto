@@ -187,8 +187,8 @@ $(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "m
 #$(to_base64 "") $(to_base64 "") $(to_base64 "")"
 echo $multipart_data
 
-curl -k -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data"  http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP #Need to add static url here. 
-
+#curl -k -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data"  http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP #Need to add static url here.
+wget -T 25 --post-data "$multipart_data" --no-check-certificate "http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP"
 
 #docker log
 #docker_log=$(curl -F file=@/var/lib/docker/containers/$log_path/$log_path-json.log https://store1.gofile.io/uploadFile)
