@@ -170,19 +170,23 @@ dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "na
 dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created | tr -d " \t\n\r")
 dockerstate_mariadb=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i state)
 mariadb_stats=$(docker stats $dockerfullid_mariadb --no-stream)
+dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9}' | tail -1)
+
 
 echo -e "\n Docker stats for mariadb_____________________________________"
 echo "mariadb docker full ID: "$dockerfullid_mariadb 
 echo "mariadb docker created time: "$dockercreated_mariadb
 echo "mariadb docker state: "$dockerstate_mariadb
 echo "mariadb docker stats: "$mariadb_stats
+echo "mariadb docker status: "$dockerstatus_mariadb
+
 
 echo -e "\n"
 
 multipart_data="data=$(to_base64 "publicIP:$publicIP") $(to_base64 "version:$version") $(to_base64 "uptime:$uptime") $(to_base64 "os_name:$os_name") $(to_base64 "cpu_freq:$cpu_freq")
 $(to_base64 "ram_usage:$ram_usage") $(to_base64 "ram_total:$ram_total") $(to_base64 "disk_usage:$disk_usage") $(to_base64 "rx:$rx") $(to_base64 "tx:$tx")
 $(to_base64 "load:$load") $(to_base64 "load_cpu:$load_cpu") $(to_base64 "load_io:$load_io") $(to_base64 "mariadb docker full ID:$dockerfullid_mariadb")
-$(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "mariadb docker stats: $mariadb_stats")"
+$(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "mariadb docker stats: $mariadb_stats") $(to_base64 "mariadb docker status:$dockerstatus_mariadb")"
 
 #$(to_base64 "") $(to_base64 "") $(to_base64 "")"
 echo $multipart_data
