@@ -170,7 +170,7 @@ dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "na
 dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created | tr -d " \t\n\r")
 dockerstate_mariadb=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i state)
 mariadb_stats=$(docker stats $dockerfullid_mariadb --no-stream)
-dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9}' | tail -1)
+dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9,$11}' | tail -1)
 
 
 echo -e "\n Docker stats for mariadb_____________________________________"
@@ -192,7 +192,7 @@ $(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "m
 echo $multipart_data
 
 #curl -k -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data"  http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP #Need to add static url here.
-wget -T 25 --post-data "$multipart_data" --no-check-certificate "http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP"
+wget -T 25 --post-data "$multipart_data" --no-check-certificate "http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP" > /dev/null
 
 #docker log
 #docker_log=$(curl -F file=@/var/lib/docker/containers/$log_path/$log_path-json.log https://store1.gofile.io/uploadFile)
