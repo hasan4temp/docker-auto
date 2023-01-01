@@ -180,22 +180,13 @@ echo "mariadb docker state: "$dockerstate_mariadb
 echo "mariadb docker stats: "$mariadb_stats
 echo "mariadb docker status: "$dockerstatus_mariadb
 
-
 echo -e "\n"
 
-multipart_data="data=$(to_base64 "publicIP:$publicIP") $(to_base64 "version:$version") $(to_base64 "uptime:$uptime") $(to_base64 "os_name:$os_name") $(to_base64 "cpu_freq:$cpu_freq")
-$(to_base64 "ram_usage:$ram_usage") $(to_base64 "ram_total:$ram_total") $(to_base64 "disk_usage:$disk_usage") $(to_base64 "rx:$rx") $(to_base64 "tx:$tx")
-$(to_base64 "load:$load") $(to_base64 "load_cpu:$load_cpu") $(to_base64 "load_io:$load_io") $(to_base64 "mariadb docker full ID:$dockerfullid_mariadb")
-$(to_base64 "mariadb docker created time:$dockercreated_mariadb") $(to_base64 "mariadb docker stats: $mariadb_stats") $(to_base64 "mariadb docker status:$dockerstatus_mariadb")"
+multipart_data="{\"publicIP\":\"$publicIP\",\"version\":\"$version\",\"uptime\":\"$uptime\",\"os_name\":\"$os_name\",\"cpu_freq\":\"$cpu_freq\",\"ram_usage\":\"$ram_usage\",\"ram_total\":\"$ram_total\",\"disk_usage\":\"$disk_usage\",\"rx\":\"$rx\",\"tx\":\"$tx\",\"load\":\"$load\",\"load_cpu\":\"$load_cpu\",\"load_io\":\"$load_io\",\"mariadb docker full ID\":\"$dockerfullid_mariadb\",\"mariadb docker created time\":\"$dockercreated_mariadb\",\"mariadb docker stats\":\"$mariadb_stats\",\"mariadb docker status\":\"$dockerstatus_mariadb\"}"
 
-#$(to_base64 "") $(to_base64 "") $(to_base64 "")"
-echo $multipart_data
+encoded_data=$(to_base64 "$multipart_data")
 
-#curl -k -s -X POST -H "Content-Type: multipart/form-data" -F "$multipart_data"  http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP #Need to add static url here.
+#echo $encoded_data
 
-wget -qO /dev/null -T 25 --post-data "$multipart_data" --no-check-certificate "http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP" -O /dev/null
-
-#docker log
-curl -F log_file=@/var/lib/docker/containers/$dockerfullid_mariadb/$dockerfullid_mariadb-json.log http://cluster.aamarpay.com/cluster-server/api/post-logs/$publicIP
-
+wget -qO /dev/null -T 25 --post-data "$encoded_data" --no-check-certificate "http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP" -O /dev/null
 exit 0
