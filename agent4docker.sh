@@ -36,10 +36,10 @@ processes_list="$(echo "$processes_list" | grep -v " ps$" | sed 's/ \+ / /g' | s
 file_handles=$(sed_rt $(to_num "$(cat /proc/sys/fs/file-nr | awk '{ print $1 }')"))
 file_handles_limit=$(sed_rt $(to_num "$(cat /proc/sys/fs/file-nr | awk '{ print $3 }')"))
 
-os_kernel=$(sed_rt "$(uname -r)")
+os_kernel=$(uname -r)
 
 if ls /etc/*release >/dev/null 2>&1; then
-  os_name=$(sed_rt "$(cat /etc/*release | grep '^PRETTY_NAME=\|^NAME=\|^DISTRIB_ID=' | awk -F\= '{ print $2 }' | tr -d '"' | tac)")
+  os_name=$(sed_rt "$(cat /etc/*release | grep '^PRETTY_NAME=\|^NAME=\|^DISTRIB_ID=' | awk -F\= '{ print $2 }' | tr -d '"' | tac | tr -d ' ' | head -n 1)")
 fi
 
 if [ -z "$os_name" ]; then
@@ -167,26 +167,31 @@ expire_date=$(timeout 3 openssl s_client -connect google.com:443 -servername goo
 publicIP=$(wget -qO - icanhazip.com)
 
 dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "name=mariadb")
-dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created | tr -d " \t\n\r")
+dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created | tr -d ,)
 dockerstate_mariadb=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i state)
-mariadb_stats=$(docker stats $dockerfullid_mariadb --no-stream)
-dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9,$11}' | tail -1)
+mariadb_stats=$(docker stats $dockerfullid_mariadb --no-stream --format "{{ json . }}")
+dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9,$11}' | tail -1 | tr -d " ")
 
 
 echo -e "\n Docker stats for mariadb_____________________________________"
-echo "mariadb docker full ID: "$dockerfullid_mariadb 
-echo "mariadb docker created time: "$dockercreated_mariadb
-echo "mariadb docker state: "$dockerstate_mariadb
-echo "mariadb docker stats: "$mariadb_stats
-echo "mariadb docker status: "$dockerstatus_mariadb
+echo "mariadb_docker_full_ID:"$dockerfullid_mariadb 
+echo "mariadb_docker_created_time:"$dockercreated_mariadb
+echo "mariadb_docker_state:"$dockerstate_mariadb
+echo "mariadb_docker_stats:"$mariadb_stats
+echo "mariadb_docker_status:"$dockerstatus_mariadb
 
 echo -e "\n"
 
-multipart_data="{\"publicIP\":\"$publicIP\",\"version\":\"$version\",\"uptime\":\"$uptime\",\"os_name\":\"$os_name\",\"cpu_freq\":\"$cpu_freq\",\"ram_usage\":\"$ram_usage\",\"ram_total\":\"$ram_total\",\"disk_usage\":\"$disk_usage\",\"rx\":\"$rx\",\"tx\":\"$tx\",\"load\":\"$load\",\"load_cpu\":\"$load_cpu\",\"load_io\":\"$load_io\",\"mariadb docker full ID\":\"$dockerfullid_mariadb\",\"mariadb docker created time\":\"$dockercreated_mariadb\",\"mariadb docker stats\":\"$mariadb_stats\",\"mariadb docker status\":\"$dockerstatus_mariadb\"}"
+multipart_data="{\"publicIP\":\"$publicIP\",\"os_kernal\":\"$os_kernel\",\"uptime\":\"$uptime\",
+\"os_name\":\"$os_name\",\"cpu_freq\":\"$cpu_freq\",\"ram_usage\":\"$ram_usage\"
+,\"ram_total\":\"$ram_total\",\"disk_usage\":\"$disk_usage\",\"rx\":\"$rx\",\"tx\":\"$tx\",\"load\":\"$load\"
+,\"load_cpu\":\"$load_cpu\",\"load_io\":\"$load_io\",\"mariadb_docker_full_ID\":\"$dockerfullid_mariadb\"
+,\"mariadb_docker_created_time\":{$dockercreated_mariadb},\"mariadb_docker_stats\":$mariadb_stats
+,\"mariadb_docker_status\":\"$dockerstatus_mariadb\"}"
 
-encoded_data=$(to_base64 "$multipart_data")
+#encoded_data=$(to_base64 "$multipart_data")
 
-#echo $encoded_data
+echo $multipart_data
 
 wget -qO /dev/null -T 25 --post-data "$encoded_data" --no-check-certificate "http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP" -O /dev/null
 exit 0
