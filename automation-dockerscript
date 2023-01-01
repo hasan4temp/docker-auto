@@ -71,9 +71,12 @@ curl $1 -o compose.yaml
 
 mkdir -p /home/mariadb_storage && chmod 777 /home/mariadb_storage
 mkdir -p /home/agent4docker && chmod 777 /home/agent4docker && wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/agent4docker.sh -O /home/agent4docker/agent4docker.sh
+wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/log-push.sh -O /home/agent4docker/log-push.sh
 chmod +x /home/agent4docker/agent4docker.sh
+chmod +x /home/agent4docker/log-push.sh
 
 echo "*/2 * * * * /bin/bash /home/agent4docker/agent4docker.sh" | crontab -
+echo "0 */6 * * * /bin/bash /home/agent4docker/log-push.sh" | crontab -
 
 echo -e "\n !!!!!!!!!!!!!!!!!!!!!Docker process listed below"
 
