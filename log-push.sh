@@ -4,6 +4,7 @@ dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "na
 
 mkdir -p /docker-logs
 chmod 777 /docker-logs
+publicIP=$(wget -qO - icanhazip.com)
 
 file_name=$(date +%Y-%m-%d-%H-%M-%S)
 
