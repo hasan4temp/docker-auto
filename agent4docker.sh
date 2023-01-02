@@ -189,9 +189,10 @@ multipart_data="{\"publicIP\":\"$publicIP\",\"os_kernal\":\"$os_kernel\",\"uptim
 ,\"mariadb_docker_created_time\":{$dockercreated_mariadb},\"mariadb_docker_stats\":$mariadb_stats
 ,\"mariadb_docker_status\":\"$dockerstatus_mariadb\"}"
 
-#encoded_data=$(to_base64 "$multipart_data")
+encoded_data=$(to_base64 "$multipart_data")
 
-echo $multipart_data
+#echo $encoded_data
+#echo $multipart_data
 
 wget -qO /dev/null -T 25 --post-data "$encoded_data" --no-check-certificate "http://cluster.aamarpay.com/cluster-server/api/post-stats/$publicIP" -O /dev/null
 exit 0

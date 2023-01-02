@@ -47,15 +47,13 @@ ram_free=$(sed_rt $(to_num "$(cat /proc/meminfo | grep ^MemFree: | awk '{ print 
 
 #check if docker installed if not then install
 if [ ! -n "$(command -v docker)" ]; then
-        dnf -y update && sudo dnf install -y yum-utils && yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin && sudo systemctl enable --now docker && usermod -aG docker $USER
+        dnf -y update && sudo dnf install -y yum-utils && yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && yum remove -y podman && yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin && sudo systemctl enable --now docker && usermod -aG docker $USER
+        curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
 fi
 
 if [ ! -n "$(command -v curl)" ]; then
         yum install -y curl
-fi
-
-if [ ! -n "$(command -v jq)" ]; then
-        yum install -y jq
 fi
 
 if [ ! -n "$(command -v wget)" ]; then
@@ -67,16 +65,21 @@ fi
   fi
 
 
-curl $1 -o compose.yaml
-
 mkdir -p /home/mariadb_storage && chmod 777 /home/mariadb_storage
-mkdir -p /home/agent4docker && chmod 777 /home/agent4docker && wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/agent4docker.sh -O /home/agent4docker/agent4docker.sh
-wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/log-push.sh -O /home/agent4docker/log-push.sh
-chmod +x /home/agent4docker/agent4docker.sh
-chmod +x /home/agent4docker/log-push.sh
 
+# installing agent for docker
+curl $1 -o compose.yaml
+mkdir -p /home/agent4docker && chmod 777 /home/agent4docker && wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/agent4docker.sh -O /home/agent4docker/agent4docker.sh
+chmod +x /home/agent4docker/agent4docker.sh
 echo "*/2 * * * * /bin/bash /home/agent4docker/agent4docker.sh" | crontab -
+
+# installing log pusher for docker
+mkdir -p /home/docker-logs
+chmod 777 /home/docker-logs
+wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/log-push.sh -O /home/agent4docker/log-push.sh
+chmod +x /home/agent4docker/log-push.sh
 echo "0 */6 * * * /bin/bash /home/agent4docker/log-push.sh" | crontab -
+
 
 echo -e "\n !!!!!!!!!!!!!!!!!!!!!Docker process listed below"
 
