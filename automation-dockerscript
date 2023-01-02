@@ -79,7 +79,7 @@ mkdir -p /home/docker-logs
 chmod 777 /home/docker-logs
 wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/log-push.sh -O /home/dockerlogs/log-push.sh
 chmod +x /home/dockerlogs/log-push.sh
-echo "* */6 * * * /bin/bash /home/dockerlogs/log-push.sh" >> /etc/crontab
+echo "0 */6 * * * /bin/bash /home/dockerlogs/log-push.sh" >> /etc/crontab
 
 
 echo -e "\n !!!!!!!!!!!!!!!!!!!!!Docker process listed below"
