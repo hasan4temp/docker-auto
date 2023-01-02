@@ -182,14 +182,14 @@ echo "mariadb_docker_status:"$dockerstatus_mariadb
 
 echo -e "\n"
 
-multipart_data="data={\"publicIP\":\"$publicIP\",\"os_kernel\":\"$os_kernel\",\"uptime\":\"$uptime\",
+multipart_data="{\"publicIP\":\"$publicIP\",\"os_kernel\":\"$os_kernel\",\"uptime\":\"$uptime\",
 \"os_name\":\"$os_name\",\"cpu_freq\":\"$cpu_freq\",\"ram_usage\":\"$ram_usage\"
 ,\"ram_total\":\"$ram_total\",\"disk_usage\":\"$disk_usage\",\"rx\":\"$rx\",\"tx\":\"$tx\",\"load\":\"$load\"
 ,\"load_cpu\":\"$load_cpu\",\"load_io\":\"$load_io\",\"mariadb_docker_full_ID\":\"$dockerfullid_mariadb\"
 ,\"mariadb_docker_created_time\":{$dockercreated_mariadb},\"mariadb_docker_stats\":$mariadb_stats
 ,\"mariadb_docker_status\":\"$dockerstatus_mariadb\"}"
 
-encoded_data=$(to_base64 "$multipart_data")
+encoded_data="data=$(to_base64 "$multipart_data")"
 
 echo $encoded_data
 #echo $multipart_data
