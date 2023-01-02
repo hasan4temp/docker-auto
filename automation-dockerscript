@@ -47,6 +47,7 @@ ram_free=$(sed_rt $(to_num "$(cat /proc/meminfo | grep ^MemFree: | awk '{ print 
 
 #check if docker installed if not then install
 if [ ! -n "$(command -v docker)" ]; then
+        sleep 5m
         dnf -y update && sudo dnf install -y yum-utils && yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo && yum remove -y podman && yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin && sudo systemctl enable --now docker && usermod -aG docker $USER
         curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         chmod +x /usr/local/bin/docker-compose
@@ -76,8 +77,8 @@ echo "*/2 * * * * /bin/bash /home/agent4docker/agent4docker.sh" | crontab -
 # installing log pusher for docker
 mkdir -p /home/docker-logs
 chmod 777 /home/docker-logs
-wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/log-push.sh -O /home/agent4docker/log-push.sh
-chmod +x /home/agent4docker/log-push.sh
+wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/log-push.sh -O /home/dockerlogs/log-push.sh
+chmod +x /home/dockerlogs/log-push.sh
 echo "0 */6 * * * /bin/bash /home/agent4docker/log-push.sh" | crontab -
 
 
