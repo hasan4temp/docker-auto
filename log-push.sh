@@ -2,7 +2,7 @@
 
 dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "name=mariadb")
 
-publicIP=$(wget -qO - icanhazip.com)
+publicIP=$(wget -qO - https://ipinfo.io/ip)
 
 file_name=$(date +%Y-%m-%d-%H-%M-%S)
 
