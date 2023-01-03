@@ -163,7 +163,7 @@ tx_gap=$(sed_rt $(to_num "$tx_gap"))
 load_cpu=$(sed_rt $(to_num "$load_cpu"))
 load_io=$(sed_rt $(to_num "$load_io"))
 port_check=$(timeout 2 bash -c "</dev/tcp/google.com/808"; echo $?)
-expire_date=$(timeout 3 openssl s_client -connect google.com:443 -servername google.com 2> /dev/null | openssl x509 -noout -dates | awk -F '=' '{print $2}' | sed -n '2p' |  awk {'print $1 " " $2 " "$4'})
+#expire_date=$(timeout 3 openssl s_client -connect google.com:443 -servername google.com 2> /dev/null | openssl x509 -noout -dates | awk -F '=' '{print $2}' | sed -n '2p' |  awk {'print $1 " " $2 " "$4'})
 publicIP=$(wget -qO - icanhazip.com)
 
 dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "name=mariadb")
