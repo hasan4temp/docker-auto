@@ -171,7 +171,7 @@ dockercreated_mariadb=$(docker inspect $dockerfullid_mariadb | grep -i created |
 dockerstate_mariadb=$(docker ps --filter name=mariadb --format '{{json .}}' | jq | grep -i state)
 mariadb_stats=$(docker stats $dockerfullid_mariadb --no-stream --format "{{ json . }}")
 dockerstatus_mariadb=$(docker ps --filter name=mariadb | awk '{print $7,$8,$9,$11}' | tail -1 | tr -d " ")
-
+wsrep_cluster_size=$(docker exec mariadb-galera mysql -u root -prootpassword -e "SHOW STATUS LIKE 'wsrep_cluster_size'" | grep wsrep_cluster_size | awk '{print $2}')
 
 echo -e "\n Docker stats for mariadb_____________________________________"
 echo "mariadb_docker_full_ID:"$dockerfullid_mariadb 
@@ -187,7 +187,7 @@ multipart_data="{\"publicIP\":\"$publicIP\",\"os_kernel\":\"$os_kernel\",\"uptim
 ,\"ram_total\":\"$ram_total\",\"disk_usage\":\"$disk_usage\",\"rx\":\"$rx\",\"tx\":\"$tx\",\"load\":\"$load\"
 ,\"load_cpu\":\"$load_cpu\",\"load_io\":\"$load_io\",\"mariadb_docker_full_ID\":\"$dockerfullid_mariadb\"
 ,\"mariadb_docker_created_time\":{$dockercreated_mariadb},\"mariadb_docker_stats\":$mariadb_stats
-,\"mariadb_docker_status\":\"$dockerstatus_mariadb\"}"
+,\"mariadb_docker_status\":\"$dockerstatus_mariadb\",\"wsrep_cluster_size\":\"$wsrep_cluster_size\"}"
 
 encoded_data="data=$(to_base64 "$multipart_data")"
 
