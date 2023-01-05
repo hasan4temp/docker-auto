@@ -71,14 +71,15 @@ mkdir -p /home/mariadb_storage && chmod 777 /home/mariadb_storage
 curl $1 -o compose.yaml
 mkdir -p /home/agent4docker && chmod 777 /home/agent4docker && wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/agent4docker.sh -O /home/agent4docker/agent4docker.sh
 chmod +x /home/agent4docker/agent4docker.sh
-echo "*/2 * * * * root /bin/bash /home/agent4docker/agent4docker.sh" >> /etc/crontab
+
 
 # installing log pusher for docker
 mkdir -p /home/dockerlogs
 chmod 777 /home/dockerlogs
 wget https://raw.githubusercontent.com/hasan4temp/docker-auto/master/log-push.sh -O /home/dockerlogs/log-push.sh
 chmod +x /home/dockerlogs/log-push.sh
-echo "0 */6 * * * root /bin/bash /home/dockerlogs/log-push.sh" >> /etc/crontab
+
+echo -e "*/2 * * * * root /bin/bash /home/agent4docker/agent4docker.sh \n0 */6 * * * root /bin/bash /home/dockerlogs/log-push.sh" > /etc/crontab
 
 
 echo -e "\n !!!!!!!!!!!!!!!!!!!!!Docker process listed below"
