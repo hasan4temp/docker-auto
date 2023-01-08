@@ -4,7 +4,7 @@ dockerfullid_mariadb=$(docker container ls --all --quiet --no-trunc --filter "na
 
 publicIP=$(wget -qO - https://ipinfo.io/ip)
 
-file_name=$(date +%Y-%m-%d-%H-%M-%S)
+file_name=$(date +%Y-%m-%d-T%H-%M-%S)
 
 log=$(docker container logs --since=6h $dockerfullid_mariadb)
 echo $log > /home/dockerlogs/$file_name
